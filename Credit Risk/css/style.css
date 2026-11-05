@@ -1,0 +1,192 @@
+/* Credit Risk Decision-Support System - Fintech Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-dark: #0f172a;
+    --border-color: #334155;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --primary-blue: #2563eb;
+    --success-bg: #ecfdf5;
+    --success-border: #a7f3d0;
+    --success-text: #065f46;
+    --warning-bg: #fffbeb;
+    --warning-border: #fde68a;
+    --warning-text: #92400e;
+    --danger-bg: #fef2f2;
+    --danger-border: #fecaca;
+    --danger-text: #991b1b;
+}
+
+html, body, [class*="css"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Executive Header Banner */
+.main-header {
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    padding: 24px 30px;
+    border-radius: 12px;
+    color: var(--text-primary);
+    margin-bottom: 22px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.main-header h1 {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.main-header p {
+    color: var(--text-secondary);
+    margin: 6px 0 0 0;
+    font-size: 0.95rem;
+}
+
+/* KPI Card Grid & Styling */
+.kpi-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-card h4 {
+    margin: 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.kpi-card .value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-top: 6px;
+}
+
+.kpi-card .sub {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Decision Recommendation Badges */
+.badge-approve {
+    background: var(--success-bg);
+    color: var(--success-text);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border: 1px solid var(--success-border);
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.badge-review {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border: 1px solid var(--warning-border);
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.badge-decline {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border: 1px solid var(--danger-border);
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+/* Tab Navigation Styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    padding: 10px 18px;
+    font-weight: 600;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    color: #475569;
+    transition: all 0.2s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    color: #1e293b;
+    background: #f1f5f9;
+}
+
+/* Cost Matrix Table Display */
+.cost-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+}
+
+.cost-table th, .cost-table td {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.9rem;
+    border: 1px solid var(--card-border);
+}
+
+.cost-table th {
+    background: #f8fafc;
+    color: #334155;
+    font-weight: 600;
+}
+
+.cost-table td.correct {
+    background: #f0fdf4;
+    color: #166534;
+    font-weight: 600;
+}
+
+.cost-table td.penalty {
+    background: #fef2f2;
+    color: #991b1b;
+    font-weight: 600;
+}

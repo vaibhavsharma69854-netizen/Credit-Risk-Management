@@ -2,9 +2,12 @@
 Streamlit Web Application: Credit Applicant Default Risk Classification System
 UCI Machine Learning Repository | Statlog (German Credit Data)
 
-A Modern Loan Officer Decision-Support Platform comparing Logistic Regression against KNN
-under Asymmetric Misclassification Costs with Dynamic Portfolio Analytics & ECOA Fairness Auditing.
-All monetary metrics in US Dollars ($).
+A Modern Loan Officer Decision-Support Platform with Modular Architecture:
+- Styles loaded from css/style.css
+- Component templates loaded from html/
+- Client-side routines loaded from javascript/main.js
+- Integrated standalone viewer available at index.html
+All monetary metrics strictly in US Dollars ($).
 """
 
 from builtins import sorted
@@ -18,46 +21,66 @@ if not exists():
     sys.argv = ["streamlit", "run", str(Path(__file__).resolve())]
     sys.exit(stcli.main())
 
-# Set project root in path
+# Set project roots in sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+for p in [PROJECT_ROOT, PROJECT_ROOT.parent]:
+    if str(p) not in sys.path:
+        sys.path.insert(0, str(p))
 
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from importlib import import_module
 
-_data_loader = import_module("src.data_loader")
-load_processed_dataset = _data_loader.load_processed_dataset
-CODE_MAPPINGS = _data_loader.CODE_MAPPINGS
-NUMERICAL_FEATURES = _data_loader.NUMERICAL_FEATURES
-CATEGORICAL_FEATURES = _data_loader.CATEGORICAL_FEATURES
-_models = import_module("src.models")
-train_and_evaluate_all = _models.train_and_evaluate_all
-get_feature_importances = _models.get_feature_importances
-
-_cost_evaluation = import_module("src.cost_evaluation")
-compute_cost_metrics = _cost_evaluation.compute_cost_metrics
-sweep_thresholds = _cost_evaluation.sweep_thresholds
-find_optimal_threshold = _cost_evaluation.find_optimal_threshold
-compute_roc_pr_curves = _cost_evaluation.compute_roc_pr_curves
-
-_fairness = import_module("src.fairness")
-compute_group_metrics = _fairness.compute_group_metrics
-compute_fairness_summary = _fairness.compute_fairness_summary
+from src.data_loader import (
+    load_processed_dataset,
+    CODE_MAPPINGS,
+    NUMERICAL_FEATURES,
+    CATEGORICAL_FEATURES
+)
+from src.models import (
+    train_and_evaluate_all,
+    get_feature_importances
+)
+from src.cost_evaluation import (
+    compute_cost_metrics,
+    sweep_thresholds,
+    find_optimal_threshold,
+    compute_roc_pr_curves
+)
+from src.fairness import (
+    compute_group_metrics,
+    compute_fairness_summary
+)
 
 # ---------------------------------------------------------
-# Page Configuration & Executive Styling
+# Asset Path Helpers & File Loaders
 # ---------------------------------------------------------
+CSS_PATH = PROJECT_ROOT / "css" / "style.css"
+HTML_DIR = PROJECT_ROOT / "html"
+JS_PATH = PROJECT_ROOT / "javascript" / "main.js"
+
+
+def read_asset(path: Path) -> str:
+    """Safely reads asset files with utf-8 encoding."""
+    if path.exists():
+        return path.read_text(encoding="utf-8")
+    return ""
+
+
+# Page Configuration
 st.set_page_config(
     page_title="Credit Risk Intelligence System",
     page_icon="🏦",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Inject External Modular CSS
+css_content = read_asset(CSS_PATH)
+if css_content:
+    st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
 
 # USD Value Mappings for Display
 USD_CHECKING_MAP = {
@@ -77,106 +100,53 @@ USD_SAVINGS_MAP = {
 }
 REV_SAVINGS_MAP = {v: k for k, v in USD_SAVINGS_MAP.items()}
 
-# Clean Fintech CSS
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .main-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        padding: 22px 28px;
-        border-radius: 12px;
-        color: #ffffff;
-        margin-bottom: 20px;
-        border: 1px solid #334155;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-    }
-    .main-header h1 {
-        color: #f8fafc;
-        margin: 0;
-        font-size: 1.85rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-    }
-    .main-header p {
-        color: #94a3b8;
-        margin: 6px 0 0 0;
-        font-size: 0.95rem;
-    }
-    
-    .kpi-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 16px 18px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        margin-bottom: 12px;
-    }
-    .kpi-card h4 {
-        margin: 0;
-        font-size: 0.82rem;
-        text-transform: uppercase;
-        color: #64748b;
-        letter-spacing: 0.05em;
-    }
-    .kpi-card .value {
-        font-size: 1.55rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-top: 4px;
-    }
-    .kpi-card .sub {
-        font-size: 0.8rem;
-        color: #64748b;
-        margin-top: 2px;
-    }
 
-    .badge-approve {
-        background: #ecfdf5;
-        color: #065f46;
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: 1px solid #a7f3d0;
-        text-align: center;
-    }
-    .badge-review {
-        background: #fffbeb;
-        color: #92400e;
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: 1px solid #fde68a;
-        text-align: center;
-    }
-    .badge-decline {
-        background: #fef2f2;
-        color: #991b1b;
-        padding: 12px 18px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 1.05rem;
-        border: 1px solid #fecaca;
-        text-align: center;
-    }
+# ---------------------------------------------------------
+# Modular HTML Renderers
+# ---------------------------------------------------------
+def render_kpi_card(title: str, value: str, subtitle: str):
+    """Renders a metric card using the html/kpi_card.html template."""
+    tmpl = read_asset(HTML_DIR / "kpi_card.html")
+    if tmpl:
+        return tmpl.format(title=title, value=value, subtitle=subtitle)
+    return f"""<div class="kpi-card"><h4>{title}</h4><div class="value">{value}</div><div class="sub">{subtitle}</div></div>"""
 
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 6px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        padding: 8px 16px;
-        font-weight: 600;
-        border-radius: 6px;
-        font-size: 0.92rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+
+def render_decision_badge(prob_lr: float, threshold: float, cost_fn: int):
+    """Renders a decision recommendation badge using the html/decision_badge.html template."""
+    tmpl = read_asset(HTML_DIR / "decision_badge.html")
+    if prob_lr < threshold:
+        params = {
+            "badge_class": "badge-approve",
+            "badge_icon": "🟢",
+            "decision_title": "APPROVE LOAN",
+            "desc_color": "#065f46",
+            "summary_title": "Low Default Risk.",
+            "description": "Applicant risk is within the cost-optimal cutoff. Strong liquidity, reserves, and verified capacity."
+        }
+    elif prob_lr < 0.40:
+        params = {
+            "badge_class": "badge-review",
+            "badge_icon": "🟡",
+            "decision_title": "MANUAL UNDERWRITING REVIEW",
+            "desc_color": "#92400e",
+            "summary_title": "Borderline Risk.",
+            "description": "Default probability exceeds automated approval threshold. Require co-signer, secondary income verification, or collateral."
+        }
+    else:
+        params = {
+            "badge_class": "badge-decline",
+            "badge_icon": "🔴",
+            "decision_title": "DECLINE CREDIT APPLICATION",
+            "desc_color": "#991b1b",
+            "summary_title": "Elevated Default Risk.",
+            "description": f"High likelihood of non-repayment. Risk exceeds bank tolerance under ${cost_fn:,} asymmetric loss policy."
+        }
+    
+    if tmpl:
+        st.markdown(tmpl.format(**params), unsafe_allow_html=True)
+    else:
+        st.markdown(f"<div class='{params['badge_class']}'>{params['badge_icon']} RECOMMENDED: {params['decision_title']}</div>", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------
@@ -211,7 +181,7 @@ feature_importances = results['feature_importances']
 
 
 # ---------------------------------------------------------
-# Sidebar: Credit Economics & Cost Parameters
+# Sidebar: Credit Economics & Decision Cutoffs
 # ---------------------------------------------------------
 st.sidebar.markdown("### 🏦 Credit Risk Parameters")
 st.sidebar.caption("All financial evaluations in US Dollars ($)")
@@ -234,7 +204,6 @@ cost_fp_dollars = st.sidebar.slider(
     help="Foregone net interest margin when a creditworthy applicant is denied."
 )
 
-# Normalized cost units for model evaluation
 cost_fn_unit = cost_fn_dollars / 1000.0
 cost_fp_unit = cost_fp_dollars / 1000.0
 
@@ -244,7 +213,6 @@ st.sidebar.info(
     f"$\\theta^* = \\frac{{C_{{FP}}}}{{C_{{FP}} + C_{{FN}}}} = \\frac{{{cost_fp_dollars:,}}}{{{cost_fp_dollars + cost_fn_dollars:,}}}$"
 )
 
-# Empirical best cutoff on test partition
 best_th_lr, min_cost_lr, _ = find_optimal_threshold(y_test, y_prob_lr, cost_fn=cost_fn_unit, cost_fp=cost_fp_unit)
 
 st.sidebar.markdown("---")
@@ -272,14 +240,13 @@ st.sidebar.metric(
 
 
 # ---------------------------------------------------------
-# Top Navigation Header
+# Top Navigation Header (Loaded from html/header.html)
 # ---------------------------------------------------------
-st.markdown("""
-<div class="main-header">
-    <h1>🏦 Credit Risk Intelligence & Underwriting System</h1>
-    <p>Retail Loan Decision Engine • Cost-Sensitive Machine Learning • All Figures in USD ($)</p>
-</div>
-""", unsafe_allow_html=True)
+header_html = read_asset(HTML_DIR / "header.html")
+if header_html:
+    st.markdown(header_html, unsafe_allow_html=True)
+else:
+    st.markdown("## 🏦 Credit Risk Intelligence & Underwriting System")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📈 Executive Dashboard",
@@ -296,74 +263,46 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 with tab1:
     st.markdown("### Executive Portfolio & Economic Summary")
     
-    # Core Portfolio Stats
     total_loans = len(df_credit)
     total_volume = df_credit['credit_amount'].sum()
     avg_loan = df_credit['credit_amount'].mean()
     def_rate = (df_credit['default'].sum() / total_loans) * 100
-    
+
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>Total Portfolio Volume</h4>
-            <div class="value">${total_volume:,.0f}</div>
-            <div class="sub">{total_loans:,} Active Applications</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(render_kpi_card("Total Portfolio Volume", f"${total_volume:,.0f}", f"{total_loans:,} Active Applications"), unsafe_allow_html=True)
     with col2:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>Average Loan Size</h4>
-            <div class="value">${avg_loan:,.0f}</div>
-            <div class="sub">Range: ${df_credit['credit_amount'].min():,} - ${df_credit['credit_amount'].max():,}</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(render_kpi_card("Average Loan Size", f"${avg_loan:,.0f}", f"Range: ${df_credit['credit_amount'].min():,} - ${df_credit['credit_amount'].max():,}"), unsafe_allow_html=True)
     with col3:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>Historic Default Rate</h4>
-            <div class="value">{def_rate:.1f}%</div>
-            <div class="sub">{int(df_credit['default'].sum())} Defaults / {total_loans - int(df_credit['default'].sum())} Good</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(render_kpi_card("Historic Default Rate", f"{def_rate:.1f}%", f"{int(df_credit['default'].sum())} Defaults / {total_loans - int(df_credit['default'].sum())} Good"), unsafe_allow_html=True)
     with col4:
-        st.markdown(f"""
-        <div class="kpi-card">
-            <h4>Cost Asymmetry Ratio</h4>
-            <div class="value">${cost_fn_dollars:,} : ${cost_fp_dollars:,}</div>
-            <div class="sub">{cost_fn_dollars/cost_fp_dollars:.1f}x Penalty on Default</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(render_kpi_card("Cost Asymmetry Ratio", f"${cost_fn_dollars:,} : ${cost_fp_dollars:,}", f"{cost_fn_dollars/cost_fp_dollars:.1f}x Penalty on Default"), unsafe_allow_html=True)
 
     st.markdown("---")
     
     c_left, c_right = st.columns([1.1, 1.3])
-    
     with c_left:
         st.markdown("#### The Cost Matrix in US Dollars")
-        st.markdown("Credit approval mistakes have asymmetric costs. A missed default is far more damaging than a lost applicant:")
-        
-        cost_display_df = pd.DataFrame(
-            [
-                ["$0 (Correctly Approved)", f"-${cost_fp_dollars:,} (Foregone Interest Margin)"],
-                [f"-${cost_fn_dollars:,} (Principal & Recovery Loss)", "$0 (Correctly Declined)"]
-            ],
-            index=["Actual Good Applicant", "Actual Default (Bad Risk)"],
-            columns=["Predicted Good (Approve)", "Predicted Bad (Decline)"]
-        )
-        st.dataframe(cost_display_df, use_container_width=True)
-        st.caption("Under standard 0.50 cutoff, banks suffer excessive defaults. Cost-optimal cutoff shifts to minimize net financial loss.")
+        cost_matrix_html = read_asset(HTML_DIR / "cost_matrix.html")
+        if cost_matrix_html:
+            st.markdown(cost_matrix_html.format(cost_fp=cost_fp_dollars, cost_fn=cost_fn_dollars), unsafe_allow_html=True)
+        else:
+            cost_df = pd.DataFrame(
+                [["$0 (Approved)", f"-${cost_fp_dollars:,} (Lost Margin)"], [f"-${cost_fn_dollars:,} (Default Loss)", "$0 (Declined)"]],
+                index=["Good Applicant", "Default (Bad Risk)"],
+                columns=["Predict Good", "Predict Bad"]
+            )
+            st.dataframe(cost_df, use_container_width=True)
 
     with c_right:
         st.markdown("#### 3-Tier Loan Officer Underwriting Workflow")
         st.markdown(f"""
         1. **Automated Clean Approval ($P(\\text{{Default}}) < {active_threshold*100:.1f}\\%$)**:
-           - Fast-track credit lines. High savings reserves, stable employment, verified credit history.
+           - High liquidity and verified steady income. Fast-track automated disbursement.
         2. **Manual Underwriting Tier (${active_threshold*100:.1f}\\% \\le P(\\text{{Default}}) < 40.0\\%$)**:
-           - Borderline zone. Loan officer reviews supplementary cash flows, requires co-signer or pledged collateral.
+           - Borderline zone. Loan officer reviews supplementary cash flows or requires collateral/co-signers.
         3. **Adverse Action / Decline ($P(\\text{{Default}}) \\ge 40.0\\%$)**:
-           - Exceeds risk tolerance. Prevents capital loss and complies with fair lending record-keeping.
+           - Exceeds bank tolerance. Protects balance sheet capital under ECOA compliance standards.
         """)
 
 
@@ -374,30 +313,15 @@ with tab2:
     st.markdown("### Interactive Portfolio Cohort Explorer")
     st.caption("Change any filter below — all KPIs, risk distributions, and charts update immediately in real time.")
 
-    # Reactive Filters
     f1, f2, f3 = st.columns(3)
     with f1:
         purpose_opts = sorted(df_credit['purpose'].unique())
-        selected_purposes = st.multiselect(
-            "Filter by Loan Purpose:",
-            options=purpose_opts,
-            default=purpose_opts[:4]
-        )
+        selected_purposes = st.multiselect("Filter by Loan Purpose:", options=purpose_opts, default=purpose_opts[:4])
     with f2:
         checking_opts = sorted(df_credit['checking_status_usd'].unique())
-        selected_checking = st.multiselect(
-            "Filter by Checking Account Status ($):",
-            options=checking_opts,
-            default=checking_opts
-        )
+        selected_checking = st.multiselect("Filter by Checking Balance ($):", options=checking_opts, default=checking_opts)
     with f3:
-        max_amount_filter = st.slider(
-            "Max Loan Amount ($):",
-            min_value=1000,
-            max_value=20000,
-            value=20000,
-            step=1000
-        )
+        max_amount_filter = st.slider("Max Loan Amount ($):", min_value=1000, max_value=20000, value=20000, step=1000)
 
     # Reactive Filtering Execution
     active_df = df_credit[
@@ -409,7 +333,6 @@ with tab2:
     if active_df.empty:
         st.warning("⚠️ No applicants match the selected criteria. Please expand your filters above.")
     else:
-        # Reactive Cohort KPIs
         cohort_count = len(active_df)
         cohort_volume = active_df['credit_amount'].sum()
         cohort_avg = active_df['credit_amount'].mean()
@@ -426,7 +349,6 @@ with tab2:
         g1, g2 = st.columns(2)
 
         with g1:
-            # Checking Status vs Default Rate (USD)
             chk_grp = active_df.groupby('checking_status_usd')['default'].agg(['count', 'mean']).reset_index()
             chk_grp['Default Rate (%)'] = chk_grp['mean'] * 100
             fig_chk = px.bar(
@@ -442,7 +364,6 @@ with tab2:
             st.plotly_chart(fig_chk, use_container_width=True)
 
         with g2:
-            # Loan Amount vs Duration Scatter (USD)
             fig_scatter = px.scatter(
                 active_df,
                 x='duration_months',
@@ -458,7 +379,6 @@ with tab2:
 
         g3, g4 = st.columns(2)
         with g3:
-            # Credit History vs Default Rate
             hist_grp = active_df.groupby('credit_history')['default'].agg(['count', 'mean']).reset_index()
             hist_grp['Default Rate (%)'] = hist_grp['mean'] * 100
             fig_hist = px.bar(
@@ -474,7 +394,6 @@ with tab2:
             st.plotly_chart(fig_hist, use_container_width=True)
 
         with g4:
-            # Age Distribution by Risk
             fig_age = px.histogram(
                 active_df,
                 x='age',
@@ -500,7 +419,6 @@ with tab3:
     st.markdown("### Model Benchmark: Logistic Regression vs KNN (N=200 Test Set)")
     st.caption(f"Financial exposure calculated under FN Loss = ${cost_fn_dollars:,} and FP Loss = ${cost_fp_dollars:,}.")
 
-    # Compute metrics dynamically
     m_lr_active = compute_cost_metrics(y_test, y_prob_lr, threshold=active_threshold, cost_fn=cost_fn_unit, cost_fp=cost_fp_unit)
     m_knn_active = compute_cost_metrics(y_test, y_prob_knn, threshold=active_threshold, cost_fn=cost_fn_unit, cost_fp=cost_fp_unit)
     m_lr_05 = compute_cost_metrics(y_test, y_prob_lr, threshold=0.50, cost_fn=cost_fn_unit, cost_fp=cost_fp_unit)
@@ -517,7 +435,6 @@ with tab3:
     b3.metric("LR Total Portfolio Loss ($)", f"${lr_dollar_cost:,.0f}", delta=f"-${lr_dollar_savings:,.0f} vs 0.50 cutoff", delta_color="inverse")
     b4.metric("Active Approval Rate", f"{m_lr_active['approval_rate']*100:.1f}%")
 
-    # Performance Comparison Table in Dollars
     st.markdown("#### Performance Summary Table @ Active Policy")
     benchmark_df = pd.DataFrame([
         {
@@ -553,7 +470,6 @@ with tab3:
     ])
     st.dataframe(benchmark_df, use_container_width=True)
 
-    # Cost Sensitivity Curve
     st.markdown("#### Portfolio Loss ($) vs Decision Cutoff (θ)")
     sweep_lr = sweep_thresholds(y_test, y_prob_lr, cost_fn=cost_fn_unit, cost_fp=cost_fp_unit)
     sweep_knn = sweep_thresholds(y_test, y_prob_knn, cost_fn=cost_fn_unit, cost_fp=cost_fp_unit)
@@ -570,15 +486,9 @@ with tab3:
     fig_cost.add_vline(x=active_threshold, line_dash="dot", line_color="#dc2626", annotation_text=f"Active ({active_threshold:.2f})")
     fig_cost.add_vline(x=bayes_threshold, line_dash="dashdot", line_color="#059669", annotation_text=f"Bayes ({bayes_threshold:.2f})")
     
-    fig_cost.update_layout(
-        xaxis_title="Decision Cutoff Threshold (θ)",
-        yaxis_title="Total Financial Loss ($)",
-        height=360,
-        margin=dict(l=40, r=40, t=40, b=40)
-    )
+    fig_cost.update_layout(xaxis_title="Decision Cutoff Threshold (θ)", yaxis_title="Total Financial Loss ($)", height=360, margin=dict(l=40, r=40, t=40, b=40))
     st.plotly_chart(fig_cost, use_container_width=True)
 
-    # Side-by-side Confusion Matrices
     cm1, cm2 = st.columns(2)
     with cm1:
         fig_cm_lr = px.imshow(
@@ -606,7 +516,7 @@ with tab3:
 # =========================================================
 with tab4:
     st.markdown("### Interactive Credit Applicant Underwriting")
-    st.caption("Test prospective applicants or load credit presets. Live model inference updates in real time with US Dollar parameters.")
+    st.caption("Live model inference updates in real time with US Dollar parameters.")
 
     preset_name = st.selectbox(
         "Load Borrower Preset Profile:",
@@ -711,7 +621,6 @@ with tab4:
             'foreign': 'Yes'
         }
 
-    # Underwriting Form Inputs
     st.markdown("#### 1. Financial & Loan Terms")
     u1, u2, u3 = st.columns(3)
     with u1:
@@ -739,7 +648,6 @@ with tab4:
         in_credits = st.slider("Existing Credits at This Bank", 1, 4, int(p_vals['existing_credits']), 1)
         in_foreign = st.selectbox("Foreign Worker Status", list(CODE_MAPPINGS['foreign_worker'].values()), index=list(CODE_MAPPINGS['foreign_worker'].values()).index(p_vals['foreign']))
 
-    # Map USD labels back to original format expected by the model pipeline
     in_checking_raw = REV_CHECKING_MAP.get(in_checking_usd, in_checking_usd)
     in_savings_raw = REV_SAVINGS_MAP.get(in_savings_usd, in_savings_usd)
 
@@ -767,7 +675,6 @@ with tab4:
     }
     app_df = pd.DataFrame([applicant_data])
 
-    # Model Inference
     prob_lr = float(lr_model.predict_proba(app_df)[0, 1])
     prob_knn = float(knn_model.predict_proba(app_df)[0, 1])
     monthly_est = in_amount / in_duration
@@ -776,7 +683,6 @@ with tab4:
     st.markdown("### Real-Time Decision Recommendation")
 
     r1, r2 = st.columns([1, 1.2])
-
     with r1:
         fig_gauge = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -808,29 +714,9 @@ with tab4:
         st.markdown(f"**Logistic Regression Default Risk:** `{prob_lr*100:.1f}%` (Cutoff: `{active_threshold*100:.1f}%`)")
         st.markdown(f"**KNN Classifier Risk:** `{prob_knn*100:.1f}%`")
 
-        if prob_lr < active_threshold:
-            st.markdown("""
-            <div class="badge-approve">🟢 RECOMMENDED DECISION: APPROVE LOAN</div>
-            <p style="margin-top: 8px; color: #065f46; font-size: 0.9rem;">
-                <b>Low Default Risk.</b> Applicant risk is within the cost-optimal cutoff. Strong liquidity, reserves, and low financial exposure.
-            </p>
-            """, unsafe_allow_html=True)
-        elif prob_lr < 0.40:
-            st.markdown("""
-            <div class="badge-review">🟡 RECOMMENDED DECISION: MANUAL UNDERWRITING REVIEW</div>
-            <p style="margin-top: 8px; color: #92400e; font-size: 0.9rem;">
-                <b>Borderline Risk.</b> Default probability exceeds automated approval threshold. Require co-signer, secondary income verification, or collateral pledge.
-            </p>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown("""
-            <div class="badge-decline">🔴 RECOMMENDED DECISION: DECLINE CREDIT APPLICATION</div>
-            <p style="margin-top: 8px; color: #991b1b; font-size: 0.9rem;">
-                <b>Elevated Default Risk.</b> High likelihood of non-repayment. Risk exceeds bank tolerance under ${0:,} asymmetric loss policy.
-            </p>
-            """.format(cost_fn_dollars), unsafe_allow_html=True)
+        # Modular Decision Badge loaded from html/decision_badge.html
+        render_decision_badge(prob_lr, active_threshold, cost_fn_dollars)
 
-    # Top Influential Risk Drivers
     st.markdown("#### Primary Decision Drivers (Model Attribution)")
     top_drivers = feature_importances.head(8).copy()
     top_drivers['Direction'] = top_drivers['Coefficient'].apply(lambda x: 'Increases Risk (Default)' if x > 0 else 'Protective (Lowers Risk)')
@@ -872,7 +758,6 @@ with tab5:
         ref_g = 'Domestic Worker'
         prot_g = 'Foreign Worker'
 
-    # Compute Group Metrics
     grp_df = compute_group_metrics(y_test, y_prob_lr, group_col, threshold=active_threshold)
     fairness_res = compute_fairness_summary(grp_df, ref_g, prot_g)
     
@@ -885,32 +770,19 @@ with tab5:
     fa3.metric(f"Approval Rate: {prot_g}", f"{fairness_res.get('protected_approval_rate', 0):.1f}%")
 
     if not passed_80:
-        st.warning(f"⚠️ **Adverse Impact Alert**: The approval rate for **{prot_g}** is {di_ratio*100:.1f}% of the reference group (below the 80% statutory threshold). Human review required to prevent systemic denial of credit.")
+        st.warning(f"⚠️ **Adverse Impact Alert**: The approval rate for **{prot_g}** is {di_ratio*100:.1f}% of the reference group (below the 80% statutory threshold). Human review required.")
     else:
         st.success(f"✅ **Compliant**: Disparate impact ratio of {di_ratio:.2f} satisfies the 4/5ths (80%) regulatory threshold.")
 
-    # Error Rate Disparity Chart
     st.markdown("#### Error Rate Distribution Across Groups")
     e_col1, e_col2 = st.columns(2)
     with e_col1:
-        fig_fpr = px.bar(
-            grp_df,
-            x='Subgroup',
-            y='False Positive Rate (FPR) %',
-            color='Subgroup',
-            title="False Positive Rate (Creditworthy Applicants Denied %)"
-        )
+        fig_fpr = px.bar(grp_df, x='Subgroup', y='False Positive Rate (FPR) %', color='Subgroup', title="False Positive Rate (Creditworthy Applicants Denied %)")
         fig_fpr.update_layout(height=290, margin=dict(l=20, r=20, t=35, b=20))
         st.plotly_chart(fig_fpr, use_container_width=True)
 
     with e_col2:
-        fig_fnr = px.bar(
-            grp_df,
-            x='Subgroup',
-            y='False Negative Rate (FNR) %',
-            color='Subgroup',
-            title="False Negative Rate (Defaulted Applicants Approved %)"
-        )
+        fig_fnr = px.bar(grp_df, x='Subgroup', y='False Negative Rate (FNR) %', color='Subgroup', title="False Negative Rate (Defaulted Applicants Approved %)")
         fig_fnr.update_layout(height=290, margin=dict(l=20, r=20, t=35, b=20))
         st.plotly_chart(fig_fnr, use_container_width=True)
 
