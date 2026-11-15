@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Intelligence & Underwriting Dashboard</title>
+    <!-- Styles in dedicated css/ folder -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Scripts in dedicated javascript/ folder -->
+    <script src="javascript/main.js" defer></script>
+</head>
+<body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="container">
+        <!-- Executive Header -->
+        <header class="main-header">
+            <h1>🏦 Credit Risk Intelligence & Underwriting System</h1>
+            <p>Retail Loan Decision Engine • Cost-Sensitive Machine Learning • All Figures in USD ($)</p>
+        </header>
+
+        <!-- Tab Navigation Bar -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="exec">📈 Executive Dashboard</button>
+            <button class="tab-btn" data-tab="underwriter">💳 Live Loan Underwriter</button>
+            <button class="tab-btn" data-tab="benchmark">⚖️ Model Economics (Optimized)</button>
+            <button class="tab-btn" data-tab="fairness">🛡️ ECOA Fairness Audit</button>
+        </nav>
+
+        <!-- Tab 1: Executive Dashboard -->
+        <section id="tab-exec" class="tab-content active">
+            <h2 class="section-title">Portfolio & Economic Summary</h2>
+            <p class="section-subtitle">Real-time risk analytics evaluated across 1,000 retail credit applications.</p>
+            
+            <div class="kpi-container">
+                <div class="kpi-card">
+                    <h4>Total Portfolio Volume</h4>
+                    <div class="value">$3,271,258</div>
+                    <div class="sub">1,000 Active Loan Records</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Average Loan Size</h4>
+                    <div class="value">$3,271</div>
+                    <div class="sub">Min: $250 | Max: $18,424</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Historical Default Rate</h4>
+                    <div class="value">30.0%</div>
+                    <div class="sub">300 Defaults / 700 Good Risk</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Cost Asymmetry Ratio</h4>
+                    <div class="value">$5,000 : $1,000</div>
+                    <div class="sub">5:1 Cost Imbalance (FN : FP)</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 32px; color: #ffffff; font-size: 1.15rem; font-weight: 700;">Asymmetric Cost Penalty Matrix</h3>
+            <table class="cost-table">
+                <thead>
+                    <tr>
+                        <th>Actual Applicant Status</th>
+                        <th>Predicted Good (Approve)</th>
+                        <th>Predicted Bad (Decline)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>Actual Good Applicant</b></td>
+                        <td class="correct">$0 (Correctly Approved)</td>
+                        <td class="penalty">-$1,000 (Lost Interest Margin)</td>
+                    </tr>
+                    <tr>
+                        <td><b>Actual Default (Bad Risk)</b></td>
+                        <td class="penalty">-$5,000 (Principal & Recovery Loss)</td>
+                        <td class="correct">$0 (Correctly Declined)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Tab 2: Live Loan Underwriter -->
+        <section id="tab-underwriter" class="tab-content">
+            <h2 class="section-title">Interactive Underwriting Assistant (Live Scoring)</h2>
+            <p class="section-subtitle">Recalculates risk default probabilities, monthly repayments, and loan approval recommendations dynamically.</p>
+
+            <div class="form-group" style="margin-bottom: 26px;">
+                <label for="presetSelect">Load Applicant Profile Preset:</label>
+                <select id="presetSelect">
+                    <option value="prime">Prime Low-Risk Professional ($2,500 Loan, ≥ $200 Checking, Owns Home)</option>
+                    <option value="nearPrime">Near-Prime Borderline Applicant ($4,500 Loan, $0-$200 Checking, Renting)</option>
+                    <option value="subprime">High-Risk Subprime Applicant ($6,000 Loan, Overdrawn Checking, Critical History)</option>
+                </select>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="inpAmount">Loan Amount ($):</label>
+                    <input type="number" id="inpAmount" value="2500" step="250">
+                </div>
+                <div class="form-group">
+                    <label for="inpDuration">Loan Term (Months):</label>
+                    <input type="number" id="inpDuration" value="12" min="4" max="72">
+                </div>
+                <div class="form-group">
+                    <label for="inpChecking">Checking Account Balance ($):</label>
+                    <select id="inpChecking">
+                        <option value="good">≥ $200 / Steady Salary</option>
+                        <option value="mid">$0 to $200</option>
+                        <option value="bad">&lt; $0 (Overdrawn)</option>
+                        <option value="none">No Checking Account</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inpSavings">Savings Account Balance ($):</label>
+                    <select id="inpSavings">
+                        <option value="high">≥ $1,000</option>
+                        <option value="mid">$500 to $1,000</option>
+                        <option value="low">&lt; $100</option>
+                        <option value="none">No / Unknown Savings</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inpHousing">Housing Status:</label>
+                    <select id="inpHousing">
+                        <option value="Own">Own Property</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Free">Free Residence</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="inpAge">Applicant Age (Years):</label>
+                    <input type="number" id="inpAge" value="45" min="18" max="75">
+                </div>
+            </div>
+
+            <!-- Decision Panel -->
+            <div class="decision-panel">
+                <div class="gauge-meter">
+                    <div class="gauge-lbl">Calibrated Default Risk</div>
+                    <div id="riskScoreDisplay" class="gauge-val">8.5%</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8;">Cost-Optimal Cutoff: 16.7%</div>
+                </div>
+                <div>
+                    <div class="repayment-box">
+                        Estimated Monthly Repayment: <span id="monthlyPaymentDisplay" class="repayment-value">$218 / month</span>
+                    </div>
+                    <div id="decisionBadgeContainer">
+                        <div class="badge-approve">🟢 RECOMMENDED DECISION: APPROVE LOAN</div>
+                    </div>
+                    <p id="decisionDesc" style="margin-top: 12px; color: #34d399; font-size: 0.94rem; line-height: 1.5;">
+                        <b>Low Default Risk.</b> Applicant risk is within the cost-optimal cutoff. Strong liquidity, high savings, and low debt ratio.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: Model Economics -->
+        <section id="tab-benchmark" class="tab-content">
+            <h2 class="section-title">Model Economics & Hyperparameter Optimization</h2>
+            <p class="section-subtitle">Trained with Stratified 5-Fold GridSearch under $5,000 default penalty and $1,000 rejection cost.</p>
+            
+            <div class="kpi-container">
+                <div class="kpi-card">
+                    <h4>Tuned Logistic Regression ROC-AUC</h4>
+                    <div class="value">0.804</div>
+                    <div class="sub">Balanced Weights & Optimized C</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Optimized KNN ROC-AUC</h4>
+                    <div class="value">0.762</div>
+                    <div class="sub">Manhattan Metric & k=15</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Cost-Optimal Cutoff (θ*)</h4>
+                    <div class="value">0.167</div>
+                    <div class="sub">Theoretical Bayes Threshold</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Portfolio Loss Reduction</h4>
+                    <div class="value">$21,500</div>
+                    <div class="sub">Compared to Unweighted Baseline</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: ECOA Fairness Audit -->
+        <section id="tab-fairness" class="tab-content">
+            <h2 class="section-title">Fair Lending & ECOA Demographic Audit</h2>
+            <p class="section-subtitle">Compliance verification against the statutory 80% (4/5ths) disparate impact rule.</p>
+            
+            <div class="kpi-container">
+                <div class="kpi-card">
+                    <h4>Disparate Impact Ratio (Age)</h4>
+                    <div class="value">0.84</div>
+                    <div class="sub">Young (&lt;25) vs Adult (≥25)</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>Disparate Impact Ratio (Gender)</h4>
+                    <div class="value">0.89</div>
+                    <div class="sub">Female vs Male Applicants</div>
+                </div>
+                <div class="kpi-card">
+                    <h4>ECOA Regulatory Status</h4>
+                    <div class="value" style="color: #34d399;">COMPLIANT</div>
+                    <div class="sub">Exceeds 80% Rule Threshold</div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
