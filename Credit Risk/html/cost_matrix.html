@@ -1,0 +1,21 @@
+<table class="cost-table">
+    <thead>
+        <tr>
+            <th>Actual Status</th>
+            <th>Predicted Good (Approve)</th>
+            <th>Predicted Bad (Decline)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><b>Actual Good Applicant</b></td>
+            <td class="correct">$0 (Correctly Approved)</td>
+            <td class="penalty">-${cost_fp:,} (Foregone Interest Margin)</td>
+        </tr>
+        <tr>
+            <td><b>Actual Default (Bad Risk)</b></td>
+            <td class="penalty">-${cost_fn:,} (Principal & Recovery Loss)</td>
+            <td class="correct">$0 (Correctly Declined)</td>
+        </tr>
+    </tbody>
+</table>

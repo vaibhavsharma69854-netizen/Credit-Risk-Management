@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Intelligence & Underwriting System</title>
+    <!-- Chart.js Engine for Visualizations & Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Styles in dedicated css/ folder -->
+    <link rel="stylesheet" href="../css/style.css">
+    <!-- Scripts in dedicated javascript/ folder -->
+    <script src="../javascript/main.js" defer></script>
+</head>
+<body>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="container">
+        <!-- Executive & Layman-Friendly Header -->
+        <header class="main-header">
+            <div class="header-badge">
+                <span class="pulse-dot"></span>
+                <span>Live AI Credit Engine • 100% USD ($)</span>
+            </div>
+            <h1>🏦 AI Credit Risk Intelligence & Smart Loan Approval</h1>
+            <p>Institutional Underwriting Made Simple • Machine Learning Risk Scoring • Interactive Graphs & Visual Analytics</p>
+        </header>
+
+        <!-- Tab Navigation Bar -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="underwriter">💳 Live Loan Underwriter</button>
+            <button class="tab-btn" data-tab="history">📜 Application History (<span id="historyTabCount">3</span>)</button>
+            <button class="tab-btn" data-tab="exec">📈 Executive Dashboard</button>
+            <button class="tab-btn" data-tab="benchmark">⚖️ Model Economics & Tuning</button>
+            <button class="tab-btn" data-tab="fairness">🛡️ Fair Lending & ECOA Audit</button>
+        </nav>
+
+        <!-- Tab 1: Live Loan Underwriter -->
+        <section id="tab-underwriter" class="tab-content active">
+            <h2 class="section-title">Institutional Credit Underwriting Engine</h2>
+            <p class="section-subtitle">Real-time credit capacity adjudication: FICO reputation, Debt-to-Income (DTI), free cash flows, and liquid reserves.</p>
+
+            <!-- Applicant Identity & Borrower Preset Card -->
+            <div class="applicant-profile-card">
+                <div class="applicant-profile-top">
+                    <div class="applicant-badge-wrap">
+                        <span class="applicant-badge">👤 Primary Borrower</span>
+                        <span class="app-id-pill" id="displayAppId">APP-2026-8841</span>
+                    </div>
+                    <div class="applicant-actions-wrap">
+                        <button type="button" id="btnLogApplication" class="btn-log-app">💾 Save to History</button>
+                        <span id="saveStatusToast" class="save-toast-msg"></span>
+                    </div>
+                </div>
+                <div class="applicant-name-row">
+                    <div class="form-group applicant-name-field">
+                        <label for="inpApplicantName">Applicant Legal Full Name:</label>
+                        <span class="layman-tip">Enter borrower's legal full name for official records.</span>
+                        <div class="applicant-input-wrap">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="inpApplicantName" value="Sarah Jenkins" placeholder="e.g. Sarah Jenkins">
+                        </div>
+                    </div>
+                    <div class="form-group applicant-preset-field">
+                        <label for="presetSelect">Load Applicant Profile or Benchmark:</label>
+                        <span class="layman-tip">Pre-fill real-world profiles or verified benchmark cases.</span>
+                        <select id="presetSelect">
+                            <optgroup label="Everyday Borrower Presets (Easy to Understand)">
+                                <option value="sarah" selected>Sarah Jenkins (Software Engineer) — $5,000 Loan • High Savings • Prime 780 FICO (Approved)</option>
+                                <option value="marcus">Marcus Vance (Freelancer) — $8,000 Loan • Moderate Savings • Near-Prime 675 FICO (Borderline)</option>
+                                <option value="david">David Miller (Recent Graduate) — $6,000 Loan • Low Savings • Subprime 570 FICO (Declined)</option>
+                            </optgroup>
+                            <optgroup label="Real Verified UCI Dataset Benchmark Records">
+                                <option value="real_104">Applicant #104: Approved Auto Loan (FICO 745, DTI 28%, Safe Reserves)</option>
+                                <option value="real_312">Applicant #312: Defaulted Commercial Loan (FICO 585, Overdrawn, Critical History)</option>
+                                <option value="real_582">Applicant #582: Equipment Loan (FICO 660, Borderline DTI 41%)</option>
+                                <option value="real_876">Applicant #876: Emergency Repair Loan (FICO 530, Zero Cushion, Overdrawn)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Underwriter Live Metric Ribbon -->
+            <div class="underwriter-metric-ribbon">
+                <div class="underwriter-metric-box">
+                    <div class="metric-label-row">
+                        <span class="lbl">FICO Credit Score</span>
+                        <span id="ribbonFicoPill" class="badge-pill pill-good">Prime</span>
+                    </div>
+                    <div id="ribbonFicoVal" class="metric-num">780</div>
+                    <div class="metric-layman-explainer">Credit reputation score (300 to 850).</div>
+                </div>
+
+                <div class="underwriter-metric-box">
+                    <div class="metric-label-row">
+                        <span class="lbl">Debt-to-Income (DTI)</span>
+                        <span id="ribbonDtiPill" class="badge-pill pill-good">Safe ≤ 36%</span>
+                    </div>
+                    <div id="ribbonDtiVal" class="metric-num">22.4%</div>
+                    <div class="metric-layman-explainer">Portion of monthly pay used for debts.</div>
+                </div>
+
+                <div class="underwriter-metric-box">
+                    <div class="metric-label-row">
+                        <span class="lbl">Emergency Cushion</span>
+                        <span id="ribbonReservesPill" class="badge-pill pill-good">Strong ≥ 2 mos</span>
+                    </div>
+                    <div id="ribbonReservesVal" class="metric-num">9.8 mos</div>
+                    <div class="metric-layman-explainer">Months you can pay bills from savings.</div>
+                </div>
+
+                <div class="underwriter-metric-box">
+                    <div class="metric-label-row">
+                        <span class="lbl">Risk-Adjusted APR</span>
+                        <span class="badge-pill pill-good">Low Rate</span>
+                    </div>
+                    <div id="ribbonAprVal" class="metric-num">5.99%</div>
+                    <div class="metric-layman-explainer">Annual borrowing interest rate.</div>
+                </div>
+
+                <div class="underwriter-metric-box">
+                    <div class="metric-label-row">
+                        <span class="lbl">Monthly Free Cash</span>
+                        <span id="ribbonFreeCashPill" class="badge-pill pill-good">Healthy Cash</span>
+                    </div>
+                    <div id="ribbonFreeCashVal" class="metric-num">$5,820/mo</div>
+                    <div class="metric-layman-explainer">Money left after paying all monthly debts.</div>
+                </div>
+            </div>
+
+            <!-- Interactive Underwriting Input Grid -->
+            <div class="form-grid">
+                <!-- Loan Amount -->
+                <div class="form-group">
+                    <div class="label-with-value">
+                        <label for="inpAmount">Loan Amount Requested ($):</label>
+                        <span id="valAmount" class="live-slider-badge">$5,000</span>
+                    </div>
+                    <span class="layman-tip">How much money you wish to borrow.</span>
+                    <input type="range" id="inpAmount" value="5000" min="500" max="20000" step="250">
+                </div>
+
+                <!-- Loan Duration -->
+                <div class="form-group">
+                    <div class="label-with-value">
+                        <label for="inpDuration">Loan Repayment Term:</label>
+                        <span id="valDuration" class="live-slider-badge">24 Months (2.0 Yrs)</span>
+                    </div>
+                    <span class="layman-tip">Longer terms mean lower monthly payments.</span>
+                    <input type="range" id="inpDuration" value="24" min="6" max="72" step="6">
+                </div>
+
+                <!-- FICO Score -->
+                <div class="form-group">
+                    <div class="label-with-value">
+                        <label for="inpFico">FICO Credit Score:</label>
+                        <span id="valFico" class="live-slider-badge">780 (Prime)</span>
+                    </div>
+                    <span class="layman-tip">Standard score measuring past payment reliability.</span>
+                    <input type="range" id="inpFico" value="780" min="300" max="850" step="5">
+                </div>
+
+                <!-- Monthly Income -->
+                <div class="form-group">
+                    <div class="label-with-value">
+                        <label for="inpGrossIncome">Gross Monthly Income ($):</label>
+                        <span id="valGrossIncome" class="live-slider-badge">$7,500 / mo</span>
+                    </div>
+                    <span class="layman-tip">Total earnings before taxes each month.</span>
+                    <input type="range" id="inpGrossIncome" value="7500" min="1200" max="25000" step="100">
+                </div>
+
+                <!-- Monthly Debt -->
+                <div class="form-group">
+                    <div class="label-with-value">
+                        <label for="inpMonthlyDebt">Existing Monthly Debts ($):</label>
+                        <span id="valMonthlyDebt" class="live-slider-badge">$1,100 / mo</span>
+                    </div>
+                    <span class="layman-tip">Credit cards, auto loans, student loans, rent.</span>
+                    <input type="range" id="inpMonthlyDebt" value="1100" min="0" max="8000" step="50">
+                </div>
+
+                <!-- Checking Balance -->
+                <div class="form-group">
+                    <label for="inpChecking">Checking Account Balance:</label>
+                    <span class="layman-tip">Your everyday primary bank account status.</span>
+                    <select id="inpChecking">
+                        <option value="good" selected>≥ $200 / Steady Salary Account</option>
+                        <option value="mid">$0 to $200 Modest Balance</option>
+                        <option value="overdrawn">&lt; $0 (Overdrawn Account)</option>
+                    </select>
+                </div>
+
+                <!-- Savings Tier -->
+                <div class="form-group">
+                    <label for="inpSavings">Liquid Savings & Emergency Cash:</label>
+                    <span class="layman-tip">Emergency buffer in high-yield savings or cash.</span>
+                    <select id="inpSavings">
+                        <option value="high" selected>≥ $10,000 (Substantial Cushion)</option>
+                        <option value="mid">$1,000 to $10,000 (Moderate Buffer)</option>
+                        <option value="low">&lt; $1,000 (Low / Zero Cushion)</option>
+                    </select>
+                </div>
+
+                <!-- Employment Tenure -->
+                <div class="form-group">
+                    <label for="inpEmployment">Job / Career Stability:</label>
+                    <span class="layman-tip">How long you have been at your current employer.</span>
+                    <select id="inpEmployment">
+                        <option value=">= 7 years" selected>7+ Years (Highly Stable Career)</option>
+                        <option value="4 <= ... < 7 years">4 to 7 Years (Established)</option>
+                        <option value="1 <= ... < 4 years">1 to 4 Years (Growing)</option>
+                        <option value="< 1 year">&lt; 1 Year (Recent Start)</option>
+                    </select>
+                </div>
+
+                <!-- Housing -->
+                <div class="form-group">
+                    <label for="inpHousing">Home Ownership Status:</label>
+                    <span class="layman-tip">Owning real estate lowers borrower risk.</span>
+                    <select id="inpHousing">
+                        <option value="Own" selected>Home Owner (Owns Property)</option>
+                        <option value="Rent">Tenant (Renting Apartment / House)</option>
+                        <option value="Free">Living Rent-Free / Family</option>
+                    </select>
+                </div>
+
+                <!-- Loan Purpose -->
+                <div class="form-group">
+                    <label for="inpPurpose">Loan Purpose:</label>
+                    <span class="layman-tip">What the loan will be used for.</span>
+                    <select id="inpPurpose">
+                        <option value="Car (new)" selected>New Automobile</option>
+                        <option value="Car (used)">Used Automobile</option>
+                        <option value="Business">Business Expansion</option>
+                        <option value="Radio / television">Consumer Electronics</option>
+                        <option value="Repairs">Home & Auto Repairs</option>
+                        <option value="Education">Education & Training</option>
+                    </select>
+                </div>
+
+                <!-- Credit History -->
+                <div class="form-group">
+                    <label for="inpHistory">Payment Track Record:</label>
+                    <span class="layman-tip">History of paying past loans on time.</span>
+                    <select id="inpHistory">
+                        <option value="Existing credits paid duly till now" selected>All Credits Paid On Time (Clean History)</option>
+                        <option value="Delay in paying off in past">Past 30-Day Delay (Minor Delinquency)</option>
+                        <option value="Critical account / other credits elsewhere">Past Charge-Off / Critical Accounts</option>
+                    </select>
+                </div>
+
+                <!-- Age -->
+                <div class="form-group">
+                    <label for="inpAge">Applicant Age:</label>
+                    <span class="layman-tip">Applicant age in years.</span>
+                    <input type="number" id="inpAge" value="46" min="18" max="75">
+                </div>
+            </div>
+
+            <!-- Underwriting Decision Adjudication Panel with SVG Needle Gauge & Attribution Chart -->
+            <div class="decision-panel">
+                <div class="gauge-meter">
+                    <div class="gauge-lbl">Calibrated Default Risk</div>
+                    
+                    <!-- SVG Speed-Gauge Needle Dial Diagram -->
+                    <div class="gauge-dial-container">
+                        <div class="gauge-svg-box">
+                            <svg class="gauge-svg" viewBox="0 0 220 120">
+                                <!-- Safe Arc (Green: 0% - 16.7%) -->
+                                <path d="M 20 105 A 90 90 0 0 1 70 34" fill="none" stroke="#10b981" stroke-width="12" stroke-linecap="round"/>
+                                <!-- Warning Arc (Yellow: 16.7% - 35%) -->
+                                <path d="M 74 31 A 90 90 0 0 1 146 31" fill="none" stroke="#f59e0b" stroke-width="12"/>
+                                <!-- Danger Arc (Red: 35% - 100%) -->
+                                <path d="M 150 34 A 90 90 0 0 1 200 105" fill="none" stroke="#ef4444" stroke-width="12" stroke-linecap="round"/>
+                                
+                                <!-- Center Pivot Point & Rotating Needle -->
+                                <g id="gaugeNeedleGroup" class="gauge-needle-arm">
+                                    <line x1="110" y1="105" x2="110" y2="28" stroke="#0f172a" stroke-width="3.5" stroke-linecap="round"/>
+                                    <circle cx="110" cy="28" r="3.5" fill="#2563eb"/>
+                                </g>
+                                <circle cx="110" cy="105" r="9" class="gauge-center-cap"/>
+                                <circle cx="110" cy="105" r="4" fill="#edebe4"/>
+                            </svg>
+                        </div>
+                        <div class="gauge-scale-legend">
+                            <span class="safe">🟢 Safe</span>
+                            <span class="warn">🟡 Borderline</span>
+                            <span class="danger">🔴 Danger</span>
+                        </div>
+                    </div>
+
+                    <div id="riskScoreDisplay" class="gauge-val">4.5%</div>
+                    <div class="cutoff-text">Bank Safety Cutoff: 16.7%</div>
+                </div>
+
+                <div>
+                    <div class="repayment-box">
+                        Estimated Monthly Repayment: <span id="monthlyPaymentDisplay" class="repayment-value">$221 / mo (@ 5.99% APR)</span>
+                    </div>
+                    <div id="decisionBadgeContainer">
+                        <div class="badge-approve">🟢 APPROVE CREDIT FACILITY</div>
+                    </div>
+                    <p id="decisionDesc" class="decision-desc">
+                        <b>Conforming Prime Profile for <span id="adjudicationApplicantName">Sarah Jenkins</span>.</b> Applicant exceeds institutional underwriting standards. Fast-track automated approval.
+                    </p>
+
+                    <!-- Layman Advisor Card -->
+                    <div class="advisor-card">
+                        <div id="advisorHeader" class="advisor-header">🎉 Congratulations Sarah Jenkins! You are fully qualified for this loan.</div>
+                        <div id="advisorBody" class="advisor-body">
+                            Your estimated monthly payment is <b>$221 / mo</b> at a prime <b>5.99% APR</b>. Because your debt burden is low (22.4% of your income), you will easily keep <b>+$5,820 in free cash</b> every month.
+                        </div>
+                    </div>
+
+                    <!-- Decision Drivers & Model Attribution Chart -->
+                    <div class="decision-drivers-box">
+                        <div class="chart-card-header">
+                            <div>
+                                <div class="chart-card-title">🔍 Decision Factors & Score Attribution</div>
+                                <div class="chart-card-subtitle">Key attributes driving this applicant's risk rating up or down.</div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="riskDriversChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Financial Capacity & Budget Breakdown (Charts 1, 2, 3, 4) -->
+            <h3 class="subheading-text">📊 Visual Financial Health & Budget Capacity</h3>
+            <p class="section-subtitle">Real-time budget slice, debt burden comparison against federal benchmarks, total repayment, and loan balance schedule.</p>
+            
+            <div class="chart-grid">
+                <!-- Chart 1: Monthly Income Split (Donut Chart) -->
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">🍰 Monthly Income Breakdown</div>
+                            <div class="chart-card-subtitle">How your monthly earnings are divided between debts and pocket cash.</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="budgetDonutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: DTI Benchmark (Bar Chart) -->
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">⚖️ Debt Burden vs Bank Limits</div>
+                            <div class="chart-card-subtitle">Your debt-to-income compared to standard prime & maximum conforming limits.</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="dtiBenchmarkChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Total Repayment (Principal vs Interest) -->
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">💵 Total Payback Over Term</div>
+                            <div class="chart-card-subtitle">Total borrowed amount vs cumulative interest cost at your risk APR.</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="loanRepaymentChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 4: Loan Balance Paydown Schedule (Amortization Curve) -->
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">📉 Loan Balance Paydown Schedule</div>
+                            <div class="chart-card-subtitle">Projected remaining principal balance month-by-month until paid in full.</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="amortizationScheduleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4-Point Institutional Policy Checklist -->
+            <div class="checklist-card">
+                <div class="checklist-title">📋 Institutional Lending Policy Compliance Check</div>
+                <div class="checklist-grid">
+                    <div id="chkItemDti" class="checklist-item pass">✓ DTI Capacity Ceiling (≤ 43% Pass)</div>
+                    <div id="chkItemFico" class="checklist-item pass">✓ FICO Minimum (620+ Standard Pass)</div>
+                    <div id="chkItemReserves" class="checklist-item pass">✓ Emergency Cushion (≥ 2.0 Mos Pass)</div>
+                    <div id="chkItemCashFlow" class="checklist-item pass">✓ Monthly Free Cash Buffer (Safe)</div>
+                </div>
+            </div>
+
+            <!-- Recent Underwriting Activity Log in Underwriter Tab -->
+            <div class="history-quick-card">
+                <div class="history-quick-header">
+                    <div>
+                        <h3 class="subheading-text">📜 Recent Underwriting Activity Log</h3>
+                        <p class="section-subtitle">Real-time log of applicants scored and adjudicated by the engine.</p>
+                    </div>
+                    <div class="history-quick-actions">
+                        <button type="button" id="btnQuickLog" class="btn-log-app">💾 Log Current Application</button>
+                        <button type="button" id="btnGoToHistoryTab" class="btn-secondary-action">View Full History Tab →</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="history-table" id="recentHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Date & Time</th>
+                                <th>Applicant Name</th>
+                                <th>Loan Amount</th>
+                                <th>Term & Rate</th>
+                                <th>FICO / DTI</th>
+                                <th>Decision Verdict</th>
+                                <th>Risk Score</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentHistoryTableBody">
+                            <!-- Dynamic Content populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 2: Full Application History & Audit Log -->
+        <section id="tab-history" class="tab-content">
+            <h2 class="section-title">Application History & Underwriting Audit Log</h2>
+            <p class="section-subtitle">Comprehensive institutional audit repository. Search, inspect, compare, and re-load past borrower loan evaluations.</p>
+
+            <div class="history-toolbar">
+                <div class="history-search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="historySearchInput" placeholder="Search applicant name, Ref ID, or verdict..." class="history-search-box">
+                </div>
+                <div class="history-filter-wrap">
+                    <label for="historyStatusFilter">Filter Status:</label>
+                    <select id="historyStatusFilter" class="history-select">
+                        <option value="ALL">All Decisions</option>
+                        <option value="APPROVE">Approved Only</option>
+                        <option value="CONDITIONAL">Conditional Only</option>
+                        <option value="DECLINE">Declined Only</option>
+                    </select>
+                </div>
+                <div class="history-actions-bar">
+                    <button type="button" id="btnExportHistoryCsv" class="btn-secondary-action">📥 Export CSV</button>
+                    <button type="button" id="btnResetDefaultHistory" class="btn-secondary-action">🔄 Restore Benchmarks</button>
+                    <button type="button" id="btnClearAllHistory" class="btn-danger-action">🗑️ Clear Log</button>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="history-table" id="fullHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Date & Time</th>
+                                <th>Applicant Legal Name</th>
+                                <th>Loan Amount ($)</th>
+                                <th>Term & APR</th>
+                                <th>FICO Score</th>
+                                <th>DTI Ratio</th>
+                                <th>Decision Verdict</th>
+                                <th>Risk Score</th>
+                                <th>Monthly Bill</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fullHistoryTableBody">
+                            <!-- Populated dynamically by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="historyEmptyState" class="history-empty-state" style="display: none;">
+                    <p>📭 No applications match your filter criteria or history is currently empty.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: Executive Portfolio Dashboard -->
+        <section id="tab-exec" class="tab-content">
+            <h2 class="section-title">Institutional Portfolio Performance & Loss Reserves</h2>
+            <p class="section-subtitle">Macro-level credit performance across 1,000 verified loans. Distribution of credit quality, loan purpose concentration, and statutory loss reserves.</p>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-title">Total Active Portfolio</div>
+                    <div class="kpi-value">$3.27M</div>
+                    <div class="kpi-subtitle">1,000 Institutional Loans</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Gross Default Rate</div>
+                    <div class="kpi-value">30.0%</div>
+                    <div class="kpi-subtitle">300 Historical Charge-Offs</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Optimal Cost Cutoff</div>
+                    <div class="kpi-value">16.7%</div>
+                    <div class="kpi-subtitle">5:1 Loss Matrix Threshold</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Institutional Capital Saved</div>
+                    <div class="kpi-value">$445,000</div>
+                    <div class="kpi-subtitle">vs 50% Naive Cutoff</div>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">Portfolio Credit Quality Distribution</div>
+                            <div class="chart-card-subtitle">Good credits ($2.29M) vs Historical Defaults ($0.98M)</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="portfolioDistChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">Loan Purpose Concentration</div>
+                            <div class="chart-card-subtitle">Concentration of capital across consumer and commercial categories</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="loanPurposeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: Model Economics & Tuning -->
+        <section id="tab-benchmark" class="tab-content">
+            <h2 class="section-title">Machine Learning Architecture & Cost Matrix Optimization</h2>
+            <p class="section-subtitle">Evaluating Logistic Regression (AUC = 0.804) vs KNN (AUC = 0.762) under asymmetric $5,000 False Negative default penalties.</p>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">Receiver Operating Characteristic (ROC Curves)</div>
+                            <div class="chart-card-subtitle">Discrimination capability across classification thresholds</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="rocCurvesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">Expected Portfolio Loss Curve</div>
+                            <div class="chart-card-subtitle">Asymmetric financial cost optimization curve identifying the 16.7% minimum-loss cutoff</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="costOptimizationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 5: Fair Lending & ECOA Audit -->
+        <section id="tab-fairness" class="tab-content">
+            <h2 class="section-title">Fair Lending & ECOA Demographic Compliance</h2>
+            <p class="section-subtitle">Disparate impact ratio, false positive error balance, and statutory 80% rule compliance across age and gender cohorts.</p>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">Approval Rate Disparate Impact (Four-Fifths Rule)</div>
+                            <div class="chart-card-subtitle">Comparing protected and reference demographic acceptance ratios</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="fairnessApprovalChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card-header">
+                        <div>
+                            <div class="chart-card-title">Demographic Error Rates (FPR & FNR Parity)</div>
+                            <div class="chart-card-subtitle">Verifying statistical balance across protected classes</div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="demographicErrorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Institutional Footer -->
+        <footer class="main-footer">
+            <div class="footer-note">
+                <b>Institutional Compliance:</b> Calibrated under Equal Credit Opportunity Act (ECOA) & Fair Credit Reporting Act (FCRA).
+                All monetary figures in USD ($). Data derived from UCI Machine Learning Repository Credit Benchmark.
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
